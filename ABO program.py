@@ -14,7 +14,7 @@ def load_data():
     # Replace 'antibiotics_data.xlsx' with your actual file name
     # We assume index_col=0 so the first column (Bacteria names) becomes the index
     try: 
-        df = pd.read_excel(r"C:\Users\Scott\Downloads\ABO program\ABO_data.xlsx", index_col=0)
+        df = pd.read_excel("ABO_data.xlsx", index_col=0)
         
         # Clean the data: replace NaN (empty cells) with a placeholder if needed,
         # or we will just filter them out later.
@@ -75,4 +75,5 @@ else:
 with st.sidebar:
     st.write("### Legend")
     st.markdown("- **V**: Variable response")
+
     st.markdown("- **✔ / S**: Susceptible")
