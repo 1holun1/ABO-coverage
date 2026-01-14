@@ -36,7 +36,7 @@ if not df.empty:
     details_col = df.columns[2]    # Col 3: Details (NEW)
     antibiotic_list = df.columns[3:].tolist() # Col 4 onwards: Antibiotics
 
-    tab1, tab2 = st.tabs(["💊 Compare Antibiotics", "🦠 Search Bacteria"])
+
 
     # --- TAB 1: MODIFIED FOR CLICKABILITY ---
     with tab1:
@@ -134,6 +134,7 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
 
 
