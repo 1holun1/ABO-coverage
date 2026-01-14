@@ -42,47 +42,46 @@ if not df.empty:
     # Antibiotics start from the 4th column in your new Excel layout
     antibiotic_list = df.columns[3:].tolist()
 
-# --- TAB 1: COMPARE (Forced Selection Box) ---
+# --- TAB 1: COMPARE (Robust Version) ---
     with tab1:
         antibiotic_list = df.columns[3:].tolist()
 
         selected_antibiotics = st.multiselect(
-            "Select antibiotics to compare:", 
+            "1. Select antibiotics to compare:", 
             options=antibiotic_list, 
             key="t1"
         )
         
         if selected_antibiotics:
+            # Filter data
             mask = df[selected_antibiotics].notna().any(axis=1)
             display_cols = ["Type", "Bacteria", "Information"] + selected_antibiotics
             comparison_df = df.loc[mask, display_cols].copy()
-            
-            st.info("💡 **Tip:** Check the box on the far left to see clinical pearls.")
-            
-            # We use st.data_editor with a specific key to track selection
-            edited_df = st.data_editor(
+
+            # NEW: Bacteria Info Selector for Tab 1
+            st.write("---")
+            bact_to_lookup = st.selectbox(
+                "2. (Optional) Select a bacterium to see Clinical Pearls:",
+                options=["None"] + comparison_df["Bacteria"].tolist(),
+                index=0,
+                key="tab1_lookup"
+            )
+
+            if bact_to_lookup != "None":
+                # Find the info for the selected bacteria
+                info_row = comparison_df[comparison_df["Bacteria"] == bact_to_lookup].iloc[0]
+                st.success(f"🦠 **{bact_to_lookup} Clinical Pearls:**\n\n{info_row['Information']}")
+
+            # Display the Table
+            st.dataframe(
                 comparison_df.style.map(highlight_cells, subset=selected_antibiotics),
                 use_container_width=True,
                 hide_index=True,
-                key="bacteria_selector",
-                # This part is crucial for showing the checkboxes
                 column_config={
                     "Type": st.column_config.TextColumn("Type", width="small"),
-                    "Information": None  # Hide the info text from the table
-                },
-                disabled=display_cols # This makes the text un-editable
+                    "Information": None  # Hide from table view
+                }
             )
-
-            # Manual check of the session state for selections
-            if "bacteria_selector" in st.session_state:
-                selection = st.session_state["bacteria_selector"].get("selection")
-                if selection and selection.get("rows"):
-                    selected_row_index = selection["rows"][0]
-                    
-                    bact_name = comparison_df.iloc[selected_row_index]["Bacteria"]
-                    bact_info = comparison_df.iloc[selected_row_index]["Information"]
-                    
-                    st.success(f"🦠 **{bact_name} Clinical Pearls:**\n\n{bact_info}")
         else:
             for _ in range(10): st.write("")
     # --- TAB 2: SEARCH BACTERIA ---
@@ -109,6 +108,7 @@ if not df.empty:
                     use_container_width=True,
                     hide_index=True
                 )
+
 
 
 
