@@ -42,7 +42,7 @@ if not df.empty:
     # Antibiotics start from the 4th column in your new Excel layout
     antibiotic_list = df.columns[3:].tolist()
 
-    # --- TAB 1: COMPARE ---
+# --- TAB 1: COMPARE (With Click-to-See-Info) ---
     with tab1:
         selected_antibiotics = st.multiselect(
             "Select antibiotics to compare:", options=antibiotic_list, key="t1"
@@ -51,16 +51,35 @@ if not df.empty:
         if selected_antibiotics:
             mask = df[selected_antibiotics].notna().any(axis=1)
             
-            # Show ONLY Type and Bacteria on the left. Hide "Information" here.
-            display_cols = ["Type", "Bacteria"] + selected_antibiotics
+            # Note: We include 'Information' in the dataframe so we can access it, 
+            # but we will hide it from view using column_config.
+            display_cols = ["Type", "Bacteria", "Information"] + selected_antibiotics
             comparison_df = df.loc[mask, display_cols].copy()
             
-            st.dataframe(
+            st.write("💡 *Click a row to see clinical pearls for that bacteria.*")
+            
+            # --- UPDATED DATAFRAME WITH SELECTION ---
+            event = st.dataframe(
                 comparison_df.style.map(highlight_cells, subset=selected_antibiotics),
                 use_container_width=True,
                 hide_index=True,
-                column_config={"Type": st.column_config.TextColumn("Type", width="small")}
+                on_select="rerun",  # This makes the "Click" work
+                selection_mode="single_row", # Only one at a time
+                column_config={
+                    "Type": st.column_config.TextColumn("Type", width="small"),
+                    "Information": None  # THIS HIDES THE COLUMN FROM THE TABLE
+                }
             )
+
+            # --- DISPLAY THE "SMALL TAB" (INFO BOX) ON CLICK ---
+            if event.selection.rows:
+                selected_index = event.selection.rows[0]
+                # Get data from the row that was clicked
+                bact_name = comparison_df.iloc[selected_index]["Bacteria"]
+                bact_info = comparison_df.iloc[selected_index]["Information"]
+                
+                # Show the "Small Tab" as a highlighted box
+                st.success(f"🦠 **{bact_name} Clinical Pearls:**\n\n{bact_info}")
         else:
             for _ in range(10): st.write("")
 
@@ -88,3 +107,4 @@ if not df.empty:
                     use_container_width=True,
                     hide_index=True
                 )
+
