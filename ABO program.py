@@ -82,15 +82,12 @@ if not df.empty:
             )
 
             # --- POPUP TRIGGER LOGIC ---
-            # 1. Capture the selection and save to session state
             if event.selection.rows:
                 selected_index = event.selection.rows[0]
                 st.session_state.popup_data = comparison_df.iloc[selected_index]
 
-            # 2. Show popup and then "consume" the event by clearing session state
             if st.session_state.popup_data is not None:
                 row = st.session_state.popup_data
-                # Clear the data BEFORE showing to prevent re-triggering on tab switch
                 st.session_state.popup_data = None 
                 show_bacteria_details(row[bacteria_col], row[type_col], row[details_col])
         else:
@@ -117,5 +114,24 @@ if not df.empty:
             coverage = coverage[coverage.astype(str).str.lower() != 'none']
             
             if not coverage.empty:
+                # FIXED STRING LITERAL HERE
                 res_df = pd.DataFrame({
-                    "Antib
+                    "Antibiotic": coverage.index,
+                    "Effectiveness": coverage.values
+                })
+
+                def highlight_tab2(val):
+                    if str(val).upper() == 'V':
+                        return 'background-color: #ffeeba; color: black'
+                    return 'background-color: #d4edda; color: black'
+
+                st.table(res_df.style.map(highlight_tab2, subset=['Effectiveness']))
+            else:
+                st.warning("No antibiotic data found for this organism.")
+        else:
+            for _ in range(10): st.write("")
+
+# 4. SIDEBAR
+with st.sidebar:
+    st.write("### Legend")
+    st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
