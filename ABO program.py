@@ -42,11 +42,15 @@ if not df.empty:
 
     tab1, tab2 = st.tabs(["💊 Compare Antibiotics", "🦠 Search Bacteria"])
 
-    # --- TAB 1: COMPARE ANTIBIOTICS ---
+   # --- TAB 1: COMPARE ANTIBIOTICS ---
     with tab1:
         st.subheader("Compare Coverage")
         st.info("💡 **Tip:** Click a row in the table to see bacterium details.")
         
+        # Initialize a tracker for the selection if it doesn't exist
+        if 'last_selected_row' not in st.session_state:
+            st.session_state.last_selected_row = None
+
         selected_antibiotics = st.multiselect(
             "Select antibiotics to see their spectrum:", 
             options=antibiotic_list,
@@ -81,15 +85,20 @@ if not df.empty:
                 }
             )
 
-            # --- POPUP TRIGGER LOGIC ---
+            # --- UPDATED POPUP TRIGGER LOGIC ---
+            # Check if a row is actually selected
             if event.selection.rows:
-                selected_index = event.selection.rows[0]
-                st.session_state.popup_data = comparison_df.iloc[selected_index]
-
-            if st.session_state.popup_data is not None:
-                row = st.session_state.popup_data
-                st.session_state.popup_data = None 
-                show_bacteria_details(row[bacteria_col], row[type_col], row[details_col])
+                current_selection = event.selection.rows[0]
+                
+                # ONLY trigger if this is a NEW selection we haven't processed yet
+                if st.session_state.last_selected_row != current_selection:
+                    st.session_state.last_selected_row = current_selection
+                    row = comparison_df.iloc[current_selection]
+                    show_bacteria_details(row[bacteria_col], row[type_col], row[details_col])
+            else:
+                # If the user clears the selection, reset the tracker
+                st.session_state.last_selected_row = None
+                
         else:
             for _ in range(10): st.write("")
 
@@ -135,3 +144,4 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
