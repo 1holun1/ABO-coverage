@@ -139,7 +139,8 @@ if not df.empty:
 # 4. SIDEBAR
 with st.sidebar:
     st.write("### Legend")
-    st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+    st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant \n\n https://docs.google.com/spreadsheets/d/1Xso78JWtiMLXKZK9-25GuDxohZLO55oe/edit?usp=sharing&ouid=105111822552474365895&rtpof=true&sd=true")
+
 
 
 
