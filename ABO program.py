@@ -42,46 +42,49 @@ if not df.empty:
     # Antibiotics start from the 4th column in your new Excel layout
     antibiotic_list = df.columns[3:].tolist()
 
-# --- TAB 1: COMPARE (Robust Version) ---
+# --- TAB 1: CLICK TO REVEAL ---
     with tab1:
         antibiotic_list = df.columns[3:].tolist()
 
         selected_antibiotics = st.multiselect(
-            "1. Select antibiotics to compare:", 
+            "Select antibiotics to compare:", 
             options=antibiotic_list, 
             key="t1"
         )
         
         if selected_antibiotics:
-            # Filter data
             mask = df[selected_antibiotics].notna().any(axis=1)
             display_cols = ["Type", "Bacteria", "Information"] + selected_antibiotics
             comparison_df = df.loc[mask, display_cols].copy()
-
-            # NEW: Bacteria Info Selector for Tab 1
-            st.write("---")
-            bact_to_lookup = st.selectbox(
-                "2. (Optional) Select a bacterium to see Clinical Pearls:",
-                options=["None"] + comparison_df["Bacteria"].tolist(),
-                index=0,
-                key="tab1_lookup"
-            )
-
-            if bact_to_lookup != "None":
-                # Find the info for the selected bacteria
-                info_row = comparison_df[comparison_df["Bacteria"] == bact_to_lookup].iloc[0]
-                st.success(f"🦠 **{bact_to_lookup} Clinical Pearls:**\n\n{info_row['Information']}")
-
-            # Display the Table
-            st.dataframe(
+            
+            st.markdown("### 🖱️ Click a row below to see Clinical Pearls")
+            
+            # This 'selection' logic is the key to the "Click" function
+            event = st.dataframe(
                 comparison_df.style.map(highlight_cells, subset=selected_antibiotics),
                 use_container_width=True,
                 hide_index=True,
+                on_select="rerun",  # Forces the app to update when you CLICK
+                selection_mode="single_row", # Makes the whole row a button
                 column_config={
                     "Type": st.column_config.TextColumn("Type", width="small"),
-                    "Information": None  # Hide from table view
+                    "Information": None # Hide the info column from the table
                 }
             )
+
+            # Detect the CLICK event
+            # If the user clicks any row, event.selection.rows will have the index
+            if event.selection.rows:
+                selected_index = event.selection.rows[0]
+                bact_name = comparison_df.iloc[selected_index]["Bacteria"]
+                bact_info = comparison_df.iloc[selected_index]["Information"]
+                
+                # Show the pop-up information box
+                st.success(f"🦠 **{bact_name} Clinical Pearls:**\n\n{bact_info}")
+                
+                # Optional: Add a button to close the info
+                if st.button("Close Information"):
+                    st.rerun()
         else:
             for _ in range(10): st.write("")
     # --- TAB 2: SEARCH BACTERIA ---
@@ -108,6 +111,7 @@ if not df.empty:
                     use_container_width=True,
                     hide_index=True
                 )
+
 
 
 
