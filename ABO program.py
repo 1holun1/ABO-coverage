@@ -25,6 +25,9 @@ def show_bacteria_details(name, classifications, details):
 # -----------------------------------------------------------------------------
 # 3. TABS AND SEARCH LOGIC
 # -----------------------------------------------------------------------------
+# We create a list of titles and assign a key to the tabs component
+tab_titles = ["💊 Compare Antibiotics", "🦠 Search Bacteria"]
+tab1, tab2 = st.tabs(tab_titles)
 
 # Define column references based on your new Excel structure
 if not df.empty:
@@ -131,6 +134,7 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
 
 
