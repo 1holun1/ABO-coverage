@@ -42,7 +42,7 @@ if not df.empty:
     # Antibiotics start from the 4th column in your new Excel layout
     antibiotic_list = df.columns[3:].tolist()
 
-# --- TAB 1: CLICK TO REVEAL ---
+# --- TAB 1: COMPARE (Optimized for 1.52.2) ---
     with tab1:
         antibiotic_list = df.columns[3:].tolist()
 
@@ -54,36 +54,37 @@ if not df.empty:
         
         if selected_antibiotics:
             mask = df[selected_antibiotics].notna().any(axis=1)
+            # Include Information in the background dataframe
             display_cols = ["Type", "Bacteria", "Information"] + selected_antibiotics
             comparison_df = df.loc[mask, display_cols].copy()
             
-            st.markdown("### 🖱️ Click a row below to see Clinical Pearls")
-            
-            # This 'selection' logic is the key to the "Click" function
+            st.markdown("### 🖱️ Click anywhere on a row to see Clinical Pearls")
+
+            # In 1.52.2, on_select="rerun" enables the interaction
+            # selection_mode="single_row" ensures the click targets the whole line
             event = st.dataframe(
                 comparison_df.style.map(highlight_cells, subset=selected_antibiotics),
                 use_container_width=True,
                 hide_index=True,
-                on_select="rerun",  # Forces the app to update when you CLICK
-                selection_mode="single_row", # Makes the whole row a button
+                on_select="rerun",           
+                selection_mode="single_row", 
                 column_config={
                     "Type": st.column_config.TextColumn("Type", width="small"),
-                    "Information": None # Hide the info column from the table
+                    "Information": None       # Keeps the table clean by hiding info
                 }
             )
 
-            # Detect the CLICK event
-            # If the user clicks any row, event.selection.rows will have the index
-            if event.selection.rows:
-                selected_index = event.selection.rows[0]
+            # --- LOGIC TO SHOW THE "SMALL TAB" ---
+            # We check event.selection['rows'] to see which row was clicked
+            if event.selection and event.selection.get("rows"):
+                selected_index = event.selection["rows"][0]
                 bact_name = comparison_df.iloc[selected_index]["Bacteria"]
                 bact_info = comparison_df.iloc[selected_index]["Information"]
                 
-                # Show the pop-up information box
+                # The "Small Tab" (Success Box) appears here
                 st.success(f"🦠 **{bact_name} Clinical Pearls:**\n\n{bact_info}")
                 
-                # Optional: Add a button to close the info
-                if st.button("Close Information"):
+                if st.button("Close Pearls"):
                     st.rerun()
         else:
             for _ in range(10): st.write("")
@@ -111,6 +112,7 @@ if not df.empty:
                     use_container_width=True,
                     hide_index=True
                 )
+
 
 
 
