@@ -1,6 +1,6 @@
 import streamlit as st  # This MUST be line 1
 import pandas as pd
-
+st.write(f"Current Streamlit Version: {st.__version__}")
 # -----------------------------------------------------------------------------
 # 1. LOAD DATA (Positions: 0=Bacteria, 1=Type, 2=Info, 3+=Antibiotics)
 # -----------------------------------------------------------------------------
@@ -111,6 +111,7 @@ if not df.empty:
                     use_container_width=True,
                     hide_index=True
                 )
+
 
 
 
