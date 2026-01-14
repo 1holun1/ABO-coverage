@@ -17,7 +17,7 @@ def load_data():
 df = load_data()
 
 # --- POPUP DIALOG FUNCTION ---
-@st.dialog("Bacterium Information")
+@st.dialog("Common Infection")
 def show_bacteria_details(name, classifications, details):
     st.markdown(details if pd.notna(details) else "No additional details available for this organism.")
 
@@ -140,6 +140,7 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
 
 
