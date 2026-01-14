@@ -21,8 +21,6 @@ df = load_data()
 def show_bacteria_details(name, classifications, details):
     st.markdown(f"### {name}")
     st.write(details if pd.notna(details) else "No additional details available for this organism.")
-    if st.button("Close"):
-        st.rerun()
 
 # -----------------------------------------------------------------------------
 # 3. TABS AND SEARCH LOGIC
@@ -115,7 +113,7 @@ if not df.empty:
             row = df[df[bacteria_col] == selected_organism].iloc[0]
             
             st.markdown(f"**Classification:** {row[type_col]}")
-            st.markdown(f"**Common in** {row[details_col]}")
+            st.markdown(f"**Common in:** {row[details_col]}")
             
             coverage = row[antibiotic_list].dropna()
             coverage = coverage[coverage.astype(str).str.lower() != 'none']
@@ -124,7 +122,7 @@ if not df.empty:
                 # FIXED STRING LITERAL HERE
                 res_df = pd.DataFrame({
                     "Antibiotic": coverage.index,
-                    "Effectiveness": coverage.values
+                    "Coverage": coverage.values
                 })
 
                 def highlight_tab2(val):
@@ -143,5 +141,6 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
 
