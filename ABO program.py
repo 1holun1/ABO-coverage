@@ -82,8 +82,6 @@ if not df.empty:
                     bacteria_col: st.column_config.TextColumn("Bacterium", help="Click to see details")
                 }
             )
-                }
-            )
 
             # --- POPUP TRIGGER LOGIC ---
             if event.selection.rows:
@@ -139,4 +137,5 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
