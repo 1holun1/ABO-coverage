@@ -74,7 +74,7 @@ if not df.empty:
                 use_container_width=True,
                 hide_index=True,
                 on_select="rerun", # This triggers a rerun when a row is clicked
-                selection_mode="single_row",
+                selection_mode="single-row",
                 column_config={
                     details_col: None, # This hides the details column from the UI
                     type_col: st.column_config.TextColumn("Type", width="small")
@@ -135,3 +135,4 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
