@@ -42,22 +42,25 @@ if not df.empty:
     # Antibiotics start from the 4th column in your new Excel layout
     antibiotic_list = df.columns[3:].tolist()
 
-# --- TAB 1: COMPARE (Compatible Version) ---
+# --- TAB 1: COMPARE (With Click-to-See-Info) ---
     with tab1:
         selected_antibiotics = st.multiselect(
-            "Select antibiotics to compare:", options=antibiotic_list, key="t1"
+            "Select antibiotics to compare:", 
+            options=antibiotic_list, 
+            key="t1"
         )
         
         if selected_antibiotics:
             mask = df[selected_antibiotics].notna().any(axis=1)
             
-            # Keep 'Information' hidden but accessible
+            # We include 'Information' here so the code can read it,
+            # but we will hide it from the user's view in the table.
             display_cols = ["Type", "Bacteria", "Information"] + selected_antibiotics
             comparison_df = df.loc[mask, display_cols].copy()
             
-            st.write("💡 *Check the box on the left to see clinical pearls for that bacteria.*")
+            st.info("💡 **Tip:** Check the box on the far left of a row to see clinical pearls for that bacteria.")
             
-            # Use st.data_editor for better compatibility with row selection
+            # Using data_editor to allow row selection
             edited_df = st.data_editor(
                 comparison_df.style.map(highlight_cells, subset=selected_antibiotics),
                 use_container_width=True,
@@ -65,21 +68,24 @@ if not df.empty:
                 key="bacteria_selector",
                 column_config={
                     "Type": st.column_config.TextColumn("Type", width="small"),
-                    "Information": None # Hides the column
+                    "Information": None  # THIS HIDES THE COLUMN FROM THE TABLE VIEW
                 }
             )
 
-            # Check if a row is selected via the checkbox
-            # st.data_editor adds a hidden 'selection' state we can check
+            # Check if a user has checked a row
             state = st.session_state.get("bacteria_selector")
-            if state and state.get("selection") and state["selection"]["rows"]:
-                selected_index = state["selection"]["rows"][0]
-                bact_name = comparison_df.iloc[selected_index]["Bacteria"]
-                bact_info = comparison_df.iloc[selected_index]["Information"]
+            if state and "selection" in state and state["selection"]["rows"]:
+                # Get the index of the selected row
+                selected_row_index = state["selection"]["rows"][0]
                 
-                # Show the Clinical Pearl box
+                # Pull the specific data for that row
+                bact_name = comparison_df.iloc[selected_row_index]["Bacteria"]
+                bact_info = comparison_df.iloc[selected_row_index]["Information"]
+                
+                # Show the 'small tab' (Information Box)
                 st.success(f"🦠 **{bact_name} Clinical Pearls:**\n\n{bact_info}")
         else:
+            # Buffer space to keep the dropdown opening downwards
             for _ in range(10): st.write("")
     # --- TAB 2: SEARCH BACTERIA ---
     with tab2:
@@ -105,5 +111,6 @@ if not df.empty:
                     use_container_width=True,
                     hide_index=True
                 )
+
 
 
