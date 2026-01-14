@@ -41,7 +41,6 @@ if not df.empty:
     # --- TAB 1: COMPARE ANTIBIOTICS ---
     with tab1:
         st.subheader("Compare Coverage")
-        st.info("💡 **Tip:** Click a row in the table to see bacterium details.")
         
         selected_antibiotics = st.multiselect(
             "Select antibiotics to see their spectrum:", 
@@ -88,6 +87,7 @@ if not df.empty:
                 show_bacteria_details(row[bacteria_col], row[type_col], row[details_col])
         else:
             for _ in range(10): st.write("")
+        st.info("💡 **Tip:** Click a row in the table to see bacterium details.")
 
     # --- TAB 2: SEARCH BACTERIA ---
     with tab2:
@@ -131,4 +131,5 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
