@@ -24,6 +24,13 @@ def show_bacteria_details(name, classifications, details):
 
 # -----------------------------------------------------------------------------
 # 3. TABS AND SEARCH LOGIC
+
+# Track active tab in session state
+if 'active_tab' not in st.session_state:
+    st.session_state.active_tab = "💊 Compare Antibiotics"
+
+tab_titles = ["💊 Compare Antibiotics", "🦠 Search Bacteria"]
+tab1, tab2 = st.tabs(tab_titles)
 # -----------------------------------------------------------------------------
 # We create a list of titles and assign a key to the tabs component
 tab_titles = ["💊 Compare Antibiotics", "🦠 Search Bacteria"]
@@ -81,9 +88,13 @@ if not df.empty:
             )
 
             # Check if a row was clicked
-            if event.selection.rows:
+            # Check if a row was clicked
+            # We add an extra check to see if the user has interacted with Tab 2's search
+            # If they are searching in Tab 2, the 'tab2_select' key will exist in session state
+            if event.selection.rows and st.session_state.get('tab2_select') is None:
                 selected_index = event.selection.rows[0]
                 row_data = comparison_df.iloc[selected_index]
+                
                 # Call the popup
                 show_bacteria_details(
                     row_data[bacteria_col], 
@@ -134,6 +145,7 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
 
 
