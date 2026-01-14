@@ -69,15 +69,19 @@ if not df.empty:
                 return 'background-color: #d4edda; color: black'
 
             # Display Dataframe
-            event = st.dataframe(
+           event = st.dataframe(
                 comparison_df.style.map(highlight_tab1, subset=selected_antibiotics),
                 use_container_width=True,
                 hide_index=True,
-                on_select="rerun",
-                selection_mode="single-row",
+                on_select="rerun", 
+                selection_mode="single-row", # This allows clicking anywhere on the row
                 column_config={
                     details_col: None, 
-                    type_col: st.column_config.TextColumn("Type", width="small")
+                    type_col: st.column_config.TextColumn("Type", width="small"),
+                    # You can specifically format the Bacteria column to look more 'clickable'
+                    bacteria_col: st.column_config.TextColumn("Bacterium", help="Click to see details")
+                }
+            )
                 }
             )
 
@@ -135,3 +139,4 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
