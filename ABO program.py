@@ -1,79 +1,80 @@
+
 import streamlit as st
 import pandas as pd
 
-# -----------------------------------------------------------------------------
 # 1. PAGE CONFIGURATION
-# -----------------------------------------------------------------------------
-st.set_page_config(page_title="Antibiotic Coverage Search", page_icon="💊")
+st.set_page_config(page_title="Antibiotic Comparison Tool", page_icon="💊", layout="wide")
 
-# -----------------------------------------------------------------------------
 # 2. LOAD DATA
-# -----------------------------------------------------------------------------
-@st.cache_data # This caches the data so it doesn't reload on every click
+@st.cache_data
 def load_data():
-    # Replace 'antibiotics_data.xlsx' with your actual file name
-    # We assume index_col=0 so the first column (Bacteria names) becomes the index
     try: 
-        df = pd.read_excel("ABO_data.xlsx", index_col=0)
-        
-        # Clean the data: replace NaN (empty cells) with a placeholder if needed,
-        # or we will just filter them out later.
+        # Using your filename 'ABO_data.xlsx'
+        df = pd.read_excel("ABO_data.xlsx", index_col=None)
         return df
-    except FileNotFoundError:
-        st.error("File 'antibiotics_data.xlsx' not found. Please ensure the file is in the same folder.")
-        print("Error!!!")
-        return pd.DataFrame() # Return empty if failed
-        
+    except Exception:
+        return pd.DataFrame()
 
 df = load_data()
 
 # -----------------------------------------------------------------------------
-# 3. THE UI AND SEARCH LOGIC
+# 3. TABS AND SEARCH LOGIC
 # -----------------------------------------------------------------------------
-st.title("💊 Antibiotic Susceptibility Search")
-st.markdown("Search for an antibiotic to see which bacteria it covers.")
+
+# Create the tabs
+tab1, tab2 = st.tabs(["💊 Compare Antibiotics", "🦠 Search Bacteria"])
 
 if not df.empty:
-    # --- The Search Feature ---
-    # st.selectbox automatically provides the "type-ahead" suggestion feature.
-    # If a user types "penici", it will filter the list to "Penicillin G", "Penicillin V", etc.
-    antibiotic_list = df.columns.tolist()
-    selected_antibiotic = st.selectbox("Type to search antibiotic:", antibiotic_list, index=None, placeholder="e.g. Penicillin...")
+    bacteria_col = df.columns[0]
+    type_col = df.columns[1]
+    antibiotic_list = df.columns[2:].tolist()
 
-    # --- Display Results ---
-    if selected_antibiotic:
-        st.divider()
-        st.subheader(f"Coverage for: {selected_antibiotic}")
-
-        # Filter logic:
-        # We want rows where the selected column is NOT empty (NaN).
-        # We select the bacteria name (index) and the value (V, Checkmark, etc.)
-        coverage_data = df[df[selected_antibiotic].notna()][[selected_antibiotic]]
+    ## -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# TAB 1: COMPARISON WITH BACTERIA TOOLTIPS
+# -----------------------------------------------------------------------------
+with tab1:
+    st.subheader("Compare Coverage")
+    
+    selected_antibiotics = st.multiselect(
+        "Select antibiotics to see their spectrum:", 
+        options=antibiotic_list,
+        placeholder="Choose antibiotics...",
+        key="tab1_multi"
+    )
+    
+    if selected_antibiotics:
+        # Filter logic
+        mask = df[selected_antibiotics].notna().any(axis=1)
+        display_cols = [type_col, bacteria_col] + selected_antibiotics
         
-        if coverage_data.empty:
-            st.warning(f"No susceptible bacteria data found for {selected_antibiotic}.")
-        else:
-            # Let's rename the column for a cleaner display
-            coverage_data.columns = ["Susceptibility Status"]
-            
-            # Optional: formatting "V" vs others
-            # We can create a styled dataframe to highlight "V" in yellow and others in green
-            def highlight_status(val):
-                if str(val).upper() == 'V':
-                    return 'background-color: #ffeeba; color: black' # Yellowish for Variable
-                return 'background-color: #d4edda; color: black' # Greenish for Susceptible
-            
-            # Display the data
-            st.dataframe(coverage_data.style.applymap(highlight_status), use_container_width=True)
+        # If you have a 'Notes' column in Excel, include it here
+        # For now, we'll assume it's the 3rd column in your Excel (index 2)
+        # display_cols.append('Clinical Notes') 
+        
+        comparison_df = df.loc[mask, display_cols].copy()
 
-else:
-    st.info("Please add your 'antibiotics_data.xlsx' file to the directory.")
+        # CONFIGURING THE BACTERIA COLUMN HOVER
+        # We use st.column_config to add a help tooltip to the Bacteria header
+        dynamic_config = {
+            type_col: st.column_config.TextColumn("Type", width="small"),
+            bacteria_col: st.column_config.TextColumn(
+                "Bacteria Name",
+                help="Hover over names to see clinical pearls." # Header tooltip
+            )
+        }
 
-# -----------------------------------------------------------------------------
-# 4. SIDEBAR INFO (Optional)
-# -----------------------------------------------------------------------------
+        # Apply the display
+        st.dataframe(
+            comparison_df.style.map(highlight_tab1, subset=selected_antibiotics),
+            use_container_width=True,
+            hide_index=True,
+            column_config=dynamic_config
+        )
+         # ... (rest of your antibiotic coverage list logic from before)
+  
+
+# 4. SIDEBAR
 with st.sidebar:
     st.write("### Legend")
-    st.markdown("- **V**: Variable response")
-
-    st.markdown("- **✔ / S**: Susceptible")
+    st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
