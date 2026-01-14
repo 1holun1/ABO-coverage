@@ -55,7 +55,7 @@ if not df.empty:
         
         if selected_antibiotics:
             mask = df[selected_antibiotics].notna().any(axis=1)
-            display_cols = [bacteria_col, type_col, details_col] + selected_antibiotics
+            display_cols = [type_col, bacteria_col, details_col] + selected_antibiotics
             comparison_df = df.loc[mask, display_cols].copy()
             
             # Styling Logic
@@ -96,7 +96,7 @@ if not df.empty:
                 
         else:
             for _ in range(10): st.write("")
-        st.info("💡 **Tip:** Click the tick box to see bacterium details.")
+        st.info("💡 **Tip:** Click the tick box to check common infections.")
 
     # --- TAB 2: SEARCH BACTERIA ---
     with tab2:
@@ -141,6 +141,7 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
 
 
