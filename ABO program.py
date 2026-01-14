@@ -42,13 +42,22 @@ if not df.empty:
 
     tab1, tab2 = st.tabs(["💊 Compare Antibiotics", "🦠 Search Bacteria"])
 
-  # --- TAB 1: COMPARE ANTIBIOTICS ---
+# --- TAB 1: COMPARE ANTIBIOTICS ---
     with tab1:
         st.subheader("Compare Coverage")
-        st.info("💡 **Tip:** Click any row to see bacterium details.")
+        st.info("💡 **Tip:** Click the name or row to see details.")
+        
+        # This CSS makes the text "click-through" so it doesn't block row selection
+        st.html("""
+            <style>
+                [data-testid="stTable"] td, [data-testid="stDataFrame"] td {
+                    pointer-events: none;
+                }
+            </style>
+        """)
         
         selected_antibiotics = st.multiselect(
-            "Select antibiotics to see their spectrum:", 
+            "Select antibiotics:", 
             options=antibiotic_list,
             placeholder="Choose antibiotics...",
             key="tab1_multi"
@@ -59,37 +68,29 @@ if not df.empty:
             display_cols = [bacteria_col, type_col, details_col] + selected_antibiotics
             comparison_df = df.loc[mask, display_cols].copy()
             
-            # Styling Logic
             def highlight_tab1(val):
                 v_str = str(val).strip().lower()
-                if pd.isna(val) or v_str == "" or v_str == 'none':
+                if pd.isna(val) or v_str in ["", "none"]:
                     return 'background-color: #f0f2f6; color: #999999'
                 if v_str == 'v':
                     return 'background-color: #ffeeba; color: black'
                 return 'background-color: #d4edda; color: black'
 
-           # Display Dataframe
-          # Display using data_editor for better click-selection reliability
-            event = st.data_editor(
+            # Back to st.dataframe (which supports styling)
+            event = st.dataframe(
                 comparison_df.style.map(highlight_tab1, subset=selected_antibiotics),
                 use_container_width=True,
                 hide_index=True,
                 on_select="rerun",
                 selection_mode="single-row",
-                # 'disabled' ensures the user cannot edit the text
-                disabled=True, 
-                key=f"editor_{st.session_state.get('table_reset_key', 0)}",
                 column_config={
                     details_col: None, 
                     type_col: st.column_config.TextColumn("Type", width="small"),
-                    bacteria_col: st.column_config.TextColumn(
-                        "Bacterium", 
-                        help="Click any row to see details"
-                    )
+                    bacteria_col: st.column_config.TextColumn("Bacterium")
                 }
             )
 
-            # --- POPUP TRIGGER LOGIC ---
+            # Popup Trigger Logic
             if event.selection.rows:
                 selected_index = event.selection.rows[0]
                 st.session_state.popup_data = comparison_df.iloc[selected_index]
@@ -98,6 +99,8 @@ if not df.empty:
                 row = st.session_state.popup_data
                 st.session_state.popup_data = None 
                 show_bacteria_details(row[bacteria_col], row[type_col], row[details_col])
+        else:
+            for _ in range(10): st.write("")
 
           
     # --- TAB 2: SEARCH BACTERIA ---
@@ -142,6 +145,7 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
 
 
