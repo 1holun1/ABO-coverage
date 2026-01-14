@@ -28,9 +28,6 @@ def show_bacteria_details(name, classifications, details):
 # Track active tab in session state
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = "💊 Compare Antibiotics"
-
-tab_titles = ["💊 Compare Antibiotics", "🦠 Search Bacteria"]
-tab1, tab2 = st.tabs(tab_titles)
 # -----------------------------------------------------------------------------
 # We create a list of titles and assign a key to the tabs component
 tab_titles = ["💊 Compare Antibiotics", "🦠 Search Bacteria"]
@@ -145,6 +142,7 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
 
 
