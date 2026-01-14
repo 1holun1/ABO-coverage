@@ -130,7 +130,7 @@ if not df.empty:
                         return 'background-color: #ffeeba; color: black'
                     return 'background-color: #d4edda; color: black'
 
-                st.table(res_df.style.map(highlight_tab2, subset=['Effectiveness']))
+                st.table(res_df.style.map(highlight_tab2, subset=['Coverage']))
             else:
                 st.warning("No antibiotic data found for this organism.")
         else:
@@ -141,6 +141,7 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
 
 
