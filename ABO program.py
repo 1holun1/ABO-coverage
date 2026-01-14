@@ -42,10 +42,10 @@ if not df.empty:
 
     tab1, tab2 = st.tabs(["💊 Compare Antibiotics", "🦠 Search Bacteria"])
 
-    # --- TAB 1: COMPARE ANTIBIOTICS ---
+  # --- TAB 1: COMPARE ANTIBIOTICS ---
     with tab1:
         st.subheader("Compare Coverage")
-        st.info("💡 **Tip:** Click a row in the table to see bacterium details.")
+        st.info("💡 **Tip:** Click any row to see bacterium details.")
         
         selected_antibiotics = st.multiselect(
             "Select antibiotics to see their spectrum:", 
@@ -68,18 +68,20 @@ if not df.empty:
                     return 'background-color: #ffeeba; color: black'
                 return 'background-color: #d4edda; color: black'
 
-            # Display Dataframe
-           event = st.dataframe(
+            # Display Dataframe - Indentation fixed here
+            event = st.dataframe(
                 comparison_df.style.map(highlight_tab1, subset=selected_antibiotics),
                 use_container_width=True,
                 hide_index=True,
-                on_select="rerun", 
-                selection_mode="single-row", # This allows clicking anywhere on the row
+                on_select="rerun",
+                selection_mode="single-row",
                 column_config={
                     details_col: None, 
                     type_col: st.column_config.TextColumn("Type", width="small"),
-                    # You can specifically format the Bacteria column to look more 'clickable'
-                    bacteria_col: st.column_config.TextColumn("Bacterium", help="Click to see details")
+                    bacteria_col: st.column_config.TextColumn(
+                        "Bacterium", 
+                        help="Click this name to see detailed information"
+                    )
                 }
             )
 
@@ -94,7 +96,7 @@ if not df.empty:
                 show_bacteria_details(row[bacteria_col], row[type_col], row[details_col])
         else:
             for _ in range(10): st.write("")
-
+          
     # --- TAB 2: SEARCH BACTERIA ---
     with tab2:
         st.subheader("What covers this bacterium?")
@@ -137,5 +139,6 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
 
