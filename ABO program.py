@@ -21,8 +21,6 @@ df = load_data()
 def show_bacteria_details(name, classification, details):
     st.markdown(f"### {name}")
     st.write(details if pd.notna(details) else "No additional details available for this organism.")
-    if st.button("Close"):
-        st.rerun()
 
 # -----------------------------------------------------------------------------
 # 3. TABS AND SEARCH LOGIC
@@ -133,5 +131,6 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
 
