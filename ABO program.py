@@ -42,22 +42,13 @@ if not df.empty:
 
     tab1, tab2 = st.tabs(["💊 Compare Antibiotics", "🦠 Search Bacteria"])
 
-# --- TAB 1: COMPARE ANTIBIOTICS ---
+    # --- TAB 1: COMPARE ANTIBIOTICS ---
     with tab1:
         st.subheader("Compare Coverage")
-        st.info("💡 **Tip:** Click the name or row to see details.")
-        
-        # This CSS makes the text "click-through" so it doesn't block row selection
-        st.html("""
-            <style>
-                [data-testid="stTable"] td, [data-testid="stDataFrame"] td {
-                    pointer-events: none;
-                }
-            </style>
-        """)
+        st.info("💡 **Tip:** Click a row in the table to see bacterium details.")
         
         selected_antibiotics = st.multiselect(
-            "Select antibiotics:", 
+            "Select antibiotics to see their spectrum:", 
             options=antibiotic_list,
             placeholder="Choose antibiotics...",
             key="tab1_multi"
@@ -68,15 +59,16 @@ if not df.empty:
             display_cols = [bacteria_col, type_col, details_col] + selected_antibiotics
             comparison_df = df.loc[mask, display_cols].copy()
             
+            # Styling Logic
             def highlight_tab1(val):
                 v_str = str(val).strip().lower()
-                if pd.isna(val) or v_str in ["", "none"]:
+                if pd.isna(val) or v_str == "" or v_str == 'none':
                     return 'background-color: #f0f2f6; color: #999999'
                 if v_str == 'v':
                     return 'background-color: #ffeeba; color: black'
                 return 'background-color: #d4edda; color: black'
 
-            # Back to st.dataframe (which supports styling)
+            # Display Dataframe
             event = st.dataframe(
                 comparison_df.style.map(highlight_tab1, subset=selected_antibiotics),
                 use_container_width=True,
@@ -85,12 +77,11 @@ if not df.empty:
                 selection_mode="single-row",
                 column_config={
                     details_col: None, 
-                    type_col: st.column_config.TextColumn("Type", width="small"),
-                    bacteria_col: st.column_config.TextColumn("Bacterium")
+                    type_col: st.column_config.TextColumn("Type", width="small")
                 }
             )
 
-            # Popup Trigger Logic
+            # --- POPUP TRIGGER LOGIC ---
             if event.selection.rows:
                 selected_index = event.selection.rows[0]
                 st.session_state.popup_data = comparison_df.iloc[selected_index]
@@ -102,7 +93,6 @@ if not df.empty:
         else:
             for _ in range(10): st.write("")
 
-          
     # --- TAB 2: SEARCH BACTERIA ---
     with tab2:
         st.subheader("What covers this bacterium?")
@@ -145,9 +135,3 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
-
-
-
-
-
-
