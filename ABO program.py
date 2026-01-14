@@ -69,19 +69,22 @@ if not df.empty:
                 return 'background-color: #d4edda; color: black'
 
            # Display Dataframe
-            event = st.dataframe(
+          # Display using data_editor for better click-selection reliability
+            event = st.data_editor(
                 comparison_df.style.map(highlight_tab1, subset=selected_antibiotics),
                 use_container_width=True,
                 hide_index=True,
                 on_select="rerun",
-                # Changed to a list format which is more stable for 'clicking' behavior
-                selection_mode=["single-row"], 
+                selection_mode="single-row",
+                # 'disabled' ensures the user cannot edit the text
+                disabled=True, 
+                key=f"editor_{st.session_state.get('table_reset_key', 0)}",
                 column_config={
                     details_col: None, 
                     type_col: st.column_config.TextColumn("Type", width="small"),
                     bacteria_col: st.column_config.TextColumn(
-                        "Bacterium ℹ️", 
-                        help="Click anywhere on this row to see details"
+                        "Bacterium", 
+                        help="Click any row to see details"
                     )
                 }
             )
@@ -95,8 +98,7 @@ if not df.empty:
                 row = st.session_state.popup_data
                 st.session_state.popup_data = None 
                 show_bacteria_details(row[bacteria_col], row[type_col], row[details_col])
-        else:
-            for _ in range(10): st.write("")
+
           
     # --- TAB 2: SEARCH BACTERIA ---
     with tab2:
@@ -140,6 +142,7 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
 
 
