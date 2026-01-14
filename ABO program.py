@@ -20,8 +20,6 @@ df = load_data()
 @st.dialog("Bacterium Information")
 def show_bacteria_details(name, classifications, details):
     st.markdown(f"### {name}")
-    st.markdown(f"**Classification:** {classifications}")
-    st.divider()
     st.write(details if pd.notna(details) else "No additional details available for this organism.")
     if st.button("Close"):
         st.rerun()
@@ -45,7 +43,6 @@ if not df.empty:
    # --- TAB 1: COMPARE ANTIBIOTICS ---
     with tab1:
         st.subheader("Compare Coverage")
-        st.info("💡 **Tip:** Click a row in the table to see bacterium details.")
         
         # Initialize a tracker for the selection if it doesn't exist
         if 'last_selected_row' not in st.session_state:
@@ -101,6 +98,7 @@ if not df.empty:
                 
         else:
             for _ in range(10): st.write("")
+        st.info("💡 **Tip:** Click the tick box to see bacterium details.")
 
     # --- TAB 2: SEARCH BACTERIA ---
     with tab2:
@@ -117,7 +115,7 @@ if not df.empty:
             row = df[df[bacteria_col] == selected_organism].iloc[0]
             
             st.markdown(f"**Classification:** {row[type_col]}")
-            st.info(f"**Details:** {row[details_col]}")
+            st.markdown(f"**Common in** {row[details_col]}")
             
             coverage = row[antibiotic_list].dropna()
             coverage = coverage[coverage.astype(str).str.lower() != 'none']
@@ -139,9 +137,11 @@ if not df.empty:
                 st.warning("No antibiotic data found for this organism.")
         else:
             for _ in range(10): st.write("")
+        
 
 # 4. SIDEBAR
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant")
+
 
