@@ -116,8 +116,7 @@ if not df.empty:
                 # FIXED STRING LITERAL HERE
                 res_df = pd.DataFrame({
                     "Antibiotic": coverage.index,
-                    "Coverage": coverage.values,
-                     hide_index=True
+                    "Coverage": coverage.values
                 })
 
                 def highlight_tab2(val):
@@ -136,6 +135,7 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant \n\n https://docs.google.com/spreadsheets/d/1Xso78JWtiMLXKZK9-25GuDxohZLO55oe/edit?usp=sharing&ouid=105111822552474365895&rtpof=true&sd=true")
+
 
 
 
