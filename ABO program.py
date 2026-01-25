@@ -49,7 +49,7 @@ if not df.empty:
         
         if selected_antibiotics:
             mask = df[selected_antibiotics].notna().any(axis=1)
-            display_cols = [type_col, bacteria_col] + selected_antibiotics
+            display_cols = [type_col, bacteria_col, details_col] + selected_antibiotics
             comparison_df = df.loc[mask, display_cols].copy()
             
             # Styling Logic
@@ -67,7 +67,8 @@ if not df.empty:
                 use_container_width=True,
                 hide_index=True,
                 on_select="rerun",
-                selection_mode="single-row"
+                selection_mode="single-row",
+                column_config={details_col: None}
             )
 
             # --- UPDATED POPUP TRIGGER LOGIC ---
