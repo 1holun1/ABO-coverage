@@ -49,7 +49,7 @@ if not df.empty:
         
         if selected_antibiotics:
             mask = df[selected_antibiotics].notna().any(axis=1)
-            display_cols = [type_col, bacteria_col, details_col] + selected_antibiotics
+            display_cols = [type_col, bacteria_col] + selected_antibiotics
             comparison_df = df.loc[mask, display_cols].copy()
             
             # Styling Logic
@@ -67,8 +67,7 @@ if not df.empty:
                 use_container_width=True,
                 hide_index=True,
                 on_select="rerun",
-                selection_mode="single-row",
-                column_config={details_col: None}
+                selection_mode="single-row"
             )
 
             # --- UPDATED POPUP TRIGGER LOGIC ---
@@ -132,6 +131,7 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant \n\n https://docs.google.com/spreadsheets/d/1Xso78JWtiMLXKZK9-25GuDxohZLO55oe/edit?usp=sharing&ouid=105111822552474365895&rtpof=true&sd=true")
+
 
 
 
