@@ -24,12 +24,6 @@ def show_bacteria_details(name, classifications, details):
 # -----------------------------------------------------------------------------
 # 3. TABS AND SEARCH LOGIC
 # -----------------------------------------------------------------------------
-
-if not df.empty:
-    # Initialize Session State for the popup "event"
-    if 'popup_data' not in st.session_state:
-        st.session_state.popup_data = None
-
     bacteria_col = df.columns[0]   # Col 1: Name
     type_col = df.columns[1]       # Col 2: Type
     details_col = df.columns[2]    # Col 3: Details
@@ -140,6 +134,7 @@ if not df.empty:
 with st.sidebar:
     st.write("### Legend")
     st.info("**Green (✔)**: Susceptible\n\n**Yellow (V)**: Variable \n\n**Gray**: No data/ Resistant \n\n https://docs.google.com/spreadsheets/d/1Xso78JWtiMLXKZK9-25GuDxohZLO55oe/edit?usp=sharing&ouid=105111822552474365895&rtpof=true&sd=true")
+
 
 
 
